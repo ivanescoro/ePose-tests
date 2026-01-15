@@ -6,9 +6,17 @@
   "scripts": {},
   "keywords": [],
   "author": "",
+  "type": "module",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.57.0",
+    "@types/mailparser": "^3.4.6",
     "@types/node": "^25.0.6"
+  },
+  "dependencies": {
+    "googleapis": "^170.0.0",
+    "mailparser": "^3.9.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
