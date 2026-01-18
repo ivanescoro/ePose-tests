@@ -82,7 +82,7 @@ test('register', async ({page}) => {
 
     await page.getByText('メール認証へすすむ').click();
 
-    /****************************************** Email Verification **************************************/
+    /****************************************** Email Handling **************************************/
     // Email Checking
     const emailCheck = await waitForEmail(EMAIL, '認証コードをお送りします');
     await expect(emailCheck).not.toBeNull();
@@ -178,28 +178,3 @@ test('register', async ({page}) => {
 
     await expect(page.getByRole('button', { name: '入力内容を確認' })).toBeEnabled()
 });
-
-
-// test('negative test - register with existing email', async ({page}) => {
-//     await page.goto('https://app-stg.epose.com/application/complete?id=b7e45aa8-1051-7053-d18f-8bb78372107b')
-//     const emailVerification = await page.url();
-//     expect(emailVerification).toContain('https://app-stg.epose.com/application/complete');
-
-//     await expect(page.getByText('JA', {exact: true})).toHaveClass('active')
-//     await expect(page.getByText('EN', {exact: true})).toHaveClass('')
-
-//     await expect(page.getByRole('button', { name: '入力内容を確認' })).toBeDisabled();
-
-//     const fieldList = page.getByRole(('textbox'));
-//     const UID = Date.now();
-
-//     await (fieldList.first().fill(`Business`));
-//     await (fieldList.nth(1).fill(`Person`));
-//     await page.locator('input[name="telephoneNumber"]').fill(`09012345678`);
-//     await page.locator('#rc_select_0').click();
-//     await page.getByRole('option', { name: 'Australia' }).click();
-//     await (fieldList.nth(4).fill(`New Queensland`));
-//     await (fieldList.nth(5).fill(`Abbot Street`));
-
-//     await expect(page.getByRole('button', { name: '入力内容を確認' })).toBeEnabled()
-// });
