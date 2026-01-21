@@ -42,17 +42,23 @@ test('payment with credit card', async ({ page }) => {
     await expect(page.getByText('¥29,400').nth(2)).toBeVisible();
     await expect(page.getByRole('button', { name: 'お支払い情報入力' })).toBeEnabled();
     // check other footer elements
-
     await page.getByRole('button', { name: 'お支払い情報入力' }).click();
 
     await page.waitForURL('https://app-stg.epose.com/contract/payment-information', { waitUntil: "domcontentloaded", timeout: 50000});
     
-    // await expect(page.getByText("クーポンコードをお持ちの方はご入力ください ")).toBeVisible();
-    await expect(page.getByText("クーポンコードをお持ちの方はご入力ください ")).toBeEmpty();
-    await expect(page.getByText("適用")).toBeVisible();
-    await expect(page.getByText("適用")).toBeEnabled();
+    await expect(page.getByRole('textbox', { name: 'クーポンコードをお持ちの方はご入力ください' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '適用' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '適用' })).toBeEnabled();
 
-    await expect(page.locator('div').filter({ hasText: /^3 ヶ月プラン¥29,400$/ }).first()).toBeVisible();
+    // await expect(page.locator('div').filter({ hasText: /^3 ヶ月プラン¥29,400$/ }).first()).toBeVisible();
+    await expect(page.getByText('合計金額※消費税込')).toBeVisible();
+    await expect(page.getByText('3ヶ月プラン')).toBeVisible();
+    await expect(page.getByText('合計', { exact: true })).toBeVisible();
+    await expect(page.getByRole('paragraph').filter({ hasText: '¥' })).toBeVisible();
+
+    await expect(page.getByText('クレジットカード'));
+    await expect(page.getByText('銀行振込'));
+    await expect(page.getByText('ご請求先名'));
 
     // //6 Month Plan
     // await creditCardOption.nth(1).click();

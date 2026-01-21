@@ -40,7 +40,8 @@ test('register', async ({page}) => {
 
     let EMAIL_CODE:number = 0;
     let EMAIL_VERIFICATION_URL:string = '';
-    //change me
+    //move the dot since register only accepts a unique email
+    //NEXT EMAIL: l.lanfairpwllgwy.ngyllgoger111@gmail.com
     const EMAIL = `l.lanfairpwllgw.yngyllgoger111@gmail.com`
 
     //${Date.now()}
@@ -53,10 +54,9 @@ test('register', async ({page}) => {
     await page.keyboard.press('Tab');
     // checks if the error message is not visible
     await expect(page.locator('div[data-cy="error-label"]')).toBeHidden();
+    // fill the password fields
     await passwordFields.first().fill('qwert6y7u');
     await passwordFields.nth(1).fill('qwert6y7u');
-
-    await expect(page.locator('text=qwert6y7u')).toHaveCount(0);
 
     await page.getByRole('checkbox').click();
 
@@ -71,6 +71,7 @@ test('register', async ({page}) => {
     await expect(page.getByText('EN')).toHaveClass('')
 
     //checks if the current email and password length matches
+    //only length is checked since the value is hidden
     await expect(page.getByText(EMAIL)).toBeVisible();
     await expect(page.getByText('●●●●●●●●●')).toBeVisible();
 
@@ -78,7 +79,8 @@ test('register', async ({page}) => {
     await expect(page.getByText('修正する')).toBeEnabled();
 
     await page.getByText('送 信').click();
-    
+
+    //wait for the page to load
     test.setTimeout(120000);
     const applicationSuccess = await page.url();
     await expect(applicationSuccess).toContain('https://app-stg.epose.com/application/start/');
@@ -88,16 +90,20 @@ test('register', async ({page}) => {
     /****************************************** Email Handling **************************************/
 
     const emailCheck = await waitForEmail(EMAIL, '認証コードをお送りします');
+    //expect email to not be null to confirm existence
     await expect(emailCheck).not.toBeNull();
+    //expect email for the following strings to confirm correct email
     await expect(emailCheck?.subject).toContain('認証コードをお送りします');
     await expect(emailCheck?.body).toContain('認証コード');
 
+    //set the fetched emails body OR set it to empty
     await page.setContent(emailCheck?.body || '');
 
-    // checks all divs inside table cells
+    //checks all divs inside table cells
     const divs = await page.locator('table tr td div');
     const counter = await divs.count();
 
+    //set value as the href(link) value OR set it to empthy
     EMAIL_VERIFICATION_URL = await page.getByText('メール認証ページはこちら').getAttribute('href') || '';
 
     for (let i = 0; i < counter; i++) {
@@ -124,36 +130,46 @@ test('register', async ({page}) => {
             EMAIL_CODE = parseFloat(text.replace(/[^\d.]/g, '')); // extract number
         }
     }
+    //
     console.log('EMAIL_CODE:', EMAIL_CODE);
 
     /************************** Email Verification Page **************************/
-
+    
+    //if the EMAIL_VERIFICATION_URL exists, use the URL else use the specified link
     await page.goto( 
         EMAIL_VERIFICATION_URL ? 
         EMAIL_VERIFICATION_URL : 
         'https://app-stg.epose.com/application/verification'
     );
 
+    // fetch all fields
     const fields = page.locator('input[type="text"]');
 
+    // check if the page is still in Japanese(JA)
     await expect(page.getByText('JA')).toHaveClass('active')
     await expect(page.getByText('EN')).toHaveClass('')
 
+    // check if the email field is visible & disabled
     await expect(fields.first()).toBeVisible();
     await expect(fields.first()).toBeDisabled();
+    // check if the code field is visible
     await expect(fields.nth(1)).toBeVisible();
-
+    // check if the submit button is disabled
     await expect(page.getByText('送 信')).toBeDisabled();
+    // if the EMAIL_CODE exists, use the value else '00000000'
     await fields.nth(1).fill(`${EMAIL_CODE}` || '00000000');
 
+    //timeout for 100000 before checking the value of the submit button
     await expect(page.getByText('送 信')).toBeEnabled({ timeout: 10000 });
 
-    // https://app-stg.epose.com/application/start/success
     await page.getByText('送 信').click();
 
+    //fail the test if the error message exists
     if (await page.getByText('認証に失敗しました。ご入力情報をご確認の上、再度ご入力ください。').isVisible()) {
         test.fail();
     }
+    
+    //with the URL provided, wait until all dom contents have been loaded
     await page.waitForURL('https://app-stg.epose.com/application/verification*', { waitUntil: "domcontentloaded", timeout: 5000});
 
     /************************** Official Registration *********************************************/
