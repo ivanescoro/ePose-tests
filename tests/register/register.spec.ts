@@ -3,7 +3,7 @@ import { waitForEmail } from '../../utils/gmail';
 
 //storing global states in a separate file.
 
-test('check default page on load', async ({ page }) => {
+test('check default page on load', async ({ page }) => {    
     // goes to the specified page
     await page.goto('https://app-stg.epose.com/application/start');
 
@@ -36,9 +36,12 @@ test('check default page on load', async ({ page }) => {
 });
 
 test('register', async ({page}) => {
+    test.setTimeout(500000);
+
     let EMAIL_CODE:number = 0;
     let EMAIL_VERIFICATION_URL:string = '';
-    const EMAIL = `llanfairpwllgwyngyl.lgoger111@gmail.com`
+    //change me
+    const EMAIL = `l.lanfairpwllgw.yngyllgoger111@gmail.com`
 
     //${Date.now()}
     const passwordFields = page.locator('input[type="password"]');
@@ -83,7 +86,7 @@ test('register', async ({page}) => {
     await page.getByText('メール認証へすすむ').click();
 
     /****************************************** Email Handling **************************************/
-    // Email Checking
+
     const emailCheck = await waitForEmail(EMAIL, '認証コードをお送りします');
     await expect(emailCheck).not.toBeNull();
     await expect(emailCheck?.subject).toContain('認証コードをお送りします');
@@ -124,6 +127,7 @@ test('register', async ({page}) => {
     console.log('EMAIL_CODE:', EMAIL_CODE);
 
     /************************** Email Verification Page **************************/
+
     await page.goto( 
         EMAIL_VERIFICATION_URL ? 
         EMAIL_VERIFICATION_URL : 
@@ -150,15 +154,11 @@ test('register', async ({page}) => {
     if (await page.getByText('認証に失敗しました。ご入力情報をご確認の上、再度ご入力ください。').isVisible()) {
         test.fail();
     }
-
-    const applicationVerification = await page.url();
-    expect(applicationVerification).toContain('https://app-stg.epose.com/application/verification');
-
+    await page.waitForURL('https://app-stg.epose.com/application/verification*', { waitUntil: "domcontentloaded", timeout: 5000});
 
     /************************** Official Registration *********************************************/
 
-    const emailVerification = await page.url();
-    expect(emailVerification).toContain('https://app-stg.epose.com/application/verification');
+    await page.waitForURL('https://app-stg.epose.com/application/complete*', { waitUntil: "domcontentloaded", timeout: 50000 });
 
     await expect(page.getByText('JA', {exact: true})).toHaveClass('active')
     await expect(page.getByText('EN', {exact: true})).toHaveClass('')
@@ -166,15 +166,30 @@ test('register', async ({page}) => {
     await expect(page.getByRole('button', { name: '入力内容を確認' })).toBeDisabled();
 
     const fieldList = page.getByRole(('textbox'));
-    const UID = Date.now();
 
-    await (fieldList.first().fill(`Business`));
-    await (fieldList.nth(1).fill(`Person`));
-    await page.locator('input[name="telephoneNumber"]').fill(`09012345678`);
+    await (fieldList.first().fill('Business'));
+    await (fieldList.nth(1).fill('Person'));
+    await page.locator('input[name="telephoneNumber"]').fill('09012345678');
     await page.locator('#rc_select_0').click();
     await page.getByRole('option', { name: 'Australia' }).click();
     await (fieldList.nth(4).fill(`New Queensland`));
     await (fieldList.nth(5).fill(`Abbot Street`));
 
     await expect(page.getByRole('button', { name: '入力内容を確認' })).toBeEnabled()
+    await page.getByRole('button', { name: '入力内容を確認' }).click();
+
+    await page.waitForURL('https://app-stg.epose.com/application/complete/confirmation*', { waitUntil: "domcontentloaded", timeout: 50000 });
+
+    await expect(page.getByText('Business')).toBeVisible();
+    await expect(page.getByText('Person')).toBeVisible();
+    await expect(page.getByText('09012345678')).toBeVisible();
+    await expect(page.getByText('Australia')).toBeVisible();
+    await expect(page.getByText(`New Queensland`)).toBeVisible();
+    await expect(page.getByText(`Abbot Street`)).toBeVisible();
+
+    await page.getByRole('button', { name: '送 信' }).click();
+
+    await page.waitForURL('https://app-stg.epose.com/application/complete/success*', { waitUntil: "domcontentloaded", timeout: 50000});
+
+    await expect(page.getByText('本登録の申請を受け付けました')).toBeVisible();
 });

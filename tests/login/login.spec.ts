@@ -1,6 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { login } from "../../utils/login";
 
 test('login', async ({ page }) => {
-   await login(page)
+    await login(page)
 });
