@@ -8,3 +8,5 @@ node_modules/
 /playwright/.auth/
 package-lock.json
 screenshot.jpg
+token.json
+/credentials/
