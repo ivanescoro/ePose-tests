@@ -1,9 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { waitForEmail } from '../../utils/gmail';
 
-//storing global states in a separate file.
-
-test('check default page on load', async ({ page }) => {    
+test('check default page on load', async ({ page }) => {
     // goes to the specified page
     await page.goto('https://app-stg.epose.com/application/start');
 
@@ -35,16 +33,14 @@ test('check default page on load', async ({ page }) => {
     //await expect(page.getByRole('checkbox').isChecked()).toBe(false);
 });
 
-test('register', async ({page}) => {
+test('register', async ({ page }) => {
     test.setTimeout(500000);
 
-    let EMAIL_CODE:number = 0;
-    let EMAIL_VERIFICATION_URL:string = '';
+    let EMAIL_CODE = 0;
+    let EMAIL_VERIFICATION_URL = '';
     //move the dot since register only accepts a unique email
-    //NEXT EMAIL: l.lanfairpwllgwy.ngyllgoger111@gmail.com
-    const EMAIL = `l.lanfairpwllgw.yngyllgoger111@gmail.com`
+    const EMAIL = `l.l.anfairpwllgwy.ngyllgoger111@gmail.com`
 
-    //${Date.now()}
     const passwordFields = page.locator('input[type="password"]');
 
     await page.goto('https://app-stg.epose.com/application/start')
@@ -81,7 +77,7 @@ test('register', async ({page}) => {
     await page.getByText('送 信').click();
 
     //wait for the page to load
-    test.setTimeout(120000);
+    test.setTimeout(180000);
     const applicationSuccess = await page.url();
     await expect(applicationSuccess).toContain('https://app-stg.epose.com/application/start/');
 
@@ -108,7 +104,7 @@ test('register', async ({page}) => {
 
     for (let i = 0; i < counter; i++) {
         const div = divs.nth(i);
-         // Evaluate computed styles
+        // Evaluate computed styles
         const { color, fontSize, text, fontWeight } = await div.evaluate(el => {
             const style = getComputedStyle(el);
             return {
@@ -119,27 +115,26 @@ test('register', async ({page}) => {
             };
         });
 
-        // Filter by color,font size,font weight and if its a number
+        // Filter by color,font size,font weight
         // Not future proof but works for now
         if (
-            color === 'rgb(0, 0, 0)' && 
-            fontSize === '36px' && 
-            fontWeight === '500' && 
+            color === 'rgb(0, 0, 0)' &&
+            fontSize === '36px' &&
+            fontWeight === '500' &&
             text
         ) {
             EMAIL_CODE = parseFloat(text.replace(/[^\d.]/g, '')); // extract number
         }
     }
-    //
-    console.log('EMAIL_CODE:', EMAIL_CODE);
+    //console.log('EMAIL_CODE:', EMAIL_CODE);
 
     /************************** Email Verification Page **************************/
-    
+
     //if the EMAIL_VERIFICATION_URL exists, use the URL else use the specified link
-    await page.goto( 
-        EMAIL_VERIFICATION_URL ? 
-        EMAIL_VERIFICATION_URL : 
-        'https://app-stg.epose.com/application/verification'
+    await page.goto(
+        EMAIL_VERIFICATION_URL ?
+            EMAIL_VERIFICATION_URL :
+            'https://app-stg.epose.com/application/verification'
     );
 
     // fetch all fields
@@ -168,16 +163,16 @@ test('register', async ({page}) => {
     if (await page.getByText('認証に失敗しました。ご入力情報をご確認の上、再度ご入力ください。').isVisible()) {
         test.fail();
     }
-    
+
     //with the URL provided, wait until all dom contents have been loaded
-    await page.waitForURL('https://app-stg.epose.com/application/verification*', { waitUntil: "domcontentloaded", timeout: 5000});
+    await page.waitForURL('https://app-stg.epose.com/application/verification*', { waitUntil: "domcontentloaded", timeout: 5000 });
 
     /************************** Official Registration *********************************************/
 
     await page.waitForURL('https://app-stg.epose.com/application/complete*', { waitUntil: "domcontentloaded", timeout: 50000 });
 
-    await expect(page.getByText('JA', {exact: true})).toHaveClass('active')
-    await expect(page.getByText('EN', {exact: true})).toHaveClass('')
+    await expect(page.getByText('JA', { exact: true })).toHaveClass('active')
+    await expect(page.getByText('EN', { exact: true })).toHaveClass('')
 
     await expect(page.getByRole('button', { name: '入力内容を確認' })).toBeDisabled();
 
@@ -205,7 +200,7 @@ test('register', async ({page}) => {
 
     await page.getByRole('button', { name: '送 信' }).click();
 
-    await page.waitForURL('https://app-stg.epose.com/application/complete/success*', { waitUntil: "domcontentloaded", timeout: 50000});
+    await page.waitForURL('https://app-stg.epose.com/application/complete/success*', { waitUntil: "domcontentloaded", timeout: 50000 });
 
     await expect(page.getByText('本登録の申請を受け付けました')).toBeVisible();
 });

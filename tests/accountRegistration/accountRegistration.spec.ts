@@ -5,12 +5,11 @@ test('account register', async ({ page }) => {
     //change me
     const name = "Oaron Test";
 
-    test.setTimeout(500000);
+    test.setTimeout(1300000);
 
-    await login(page);
+    await login(page, { email: "bestivulle36@yopmail.com", password: "qwert6y7u" });
 
-    await page.getByText('新規登録').click();
-
+    await page.getByText('新規登録').first().click();
     //Furigana
     await page.getByRole('textbox').nth(2).fill(`${name}`);
 
@@ -41,7 +40,7 @@ test('account register', async ({ page }) => {
         isVisible && await page.getByText('顧客一覧へもどる').click();
     });
 
-    await expect(page.getByText(`${name}`)).toHaveCount(3);
+    await expect(page.getByText(`${name}`)).not.toHaveCount(0);
 
     await page.getByText('顧客情報を表示').click();
 

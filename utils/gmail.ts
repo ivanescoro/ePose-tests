@@ -18,8 +18,8 @@ async function getGmailClient() {
 }
 
 function decodeGmailBase64Url(data: string): string {
-  const base64 = data.replace(/-/g, '+').replace(/_/g, '/');
-  return Buffer.from(base64, 'base64').toString('utf-8');
+    const base64 = data.replace(/-/g, '+').replace(/_/g, '/');
+    return Buffer.from(base64, 'base64').toString('utf-8');
 }
 
 export async function getLastEmail(to: string, subjectContains: string) {
@@ -33,7 +33,7 @@ export async function getLastEmail(to: string, subjectContains: string) {
     if (!res.data.messages?.length) return null;
 
     const msgId = res.data.messages[0].id!;
-    const msg = await gmail.users.messages.get({ userId: 'me', id: msgId });
+    const msg = await gmail.users.messages.get({ userId: 'me', id: msgId, });
     // console.log('Email fetched:', msg.data.payload?.mimeType );
     // console.log('Email headers:', msg.data.payload?.parts?.[0]?.body);
     // if (msg.data.payload?.mimeType !== 'text/html') {
@@ -43,7 +43,7 @@ export async function getLastEmail(to: string, subjectContains: string) {
         throw new Error('Email body is empty');
     }
 
-    const body = decodeGmailBase64Url(msg.data.payload?.parts?.[0]?.body.data || '' );
+    const body = decodeGmailBase64Url(msg.data.payload?.parts?.[0]?.body.data || '');
 
     return {
         subject: msg.data.payload?.headers?.find((h) => h.name === 'Subject')?.value,
