@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { login } from "../../utils/login";
 
 test('account register', async ({ page }) => {
-    //change me
+    //can change name of the customer
     const name = "Oaron Test";
 
     test.setTimeout(1300000);

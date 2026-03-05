@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "playwright": "npx playwright test",
+        "test": "npx playwright test",
         "submit results": "testmo automation:run:submit && --instance https://vananaz-qa.testmo.net && --project-id 6 --name \"Playwright test run\" --source \"frontend\" --results results.xml"
     },
     "keywords": [],

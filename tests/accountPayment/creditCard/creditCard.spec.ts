@@ -66,7 +66,7 @@ test('credit card payment - 3 months', async ({ page }) => {
 
     await expect(page.locator('.invoice-details-item').nth(1).locator('div').nth(1)).toBeVisible();
     await expect(page.locator('.invoice-details-item').nth(1).locator('div').nth(1)).toHaveText(`
-        ${moment(Date.now()).format('YYYY/MM/D')}~${moment(Date.now()).add(3, 'months').format('YYYY/MM/D')}
+        ${moment(Date.now()).format('YYYY/MM/DD')}~${moment(Date.now()).add(3, 'months').format('YYYY/MM/DD')}
     `);
 
     await expect(page.locator('.invoice-details-item').nth(2).locator('div').nth(1)).toBeVisible();
