@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { login } from "../../utils/login"
 
-test('logout', async ({ page }) => {
+test('settings', async ({ page }) => {
     test.setTimeout(80000);
 
     login(page, { email: "bestivulle45@yopmail.com", password: "qwert6y7u" });
