@@ -3,15 +3,14 @@ import { login } from "../../utils/login";
 import { waitForEmail } from '../../utils/gmail';
 
 test('referral', async () => {
+    test.setTimeout(300000);
+
     const browser = await chromium.launch();
     const context = await browser.newContext({
         permissions: ['clipboard-read', 'clipboard-write'],
     });
     const page = await context.newPage();
-
     let codeExists = false;
-
-    test.setTimeout(300000);
 
     await login(page, { email: "bestivulle37@yopmail.com", password: "qwert6y7u" });
 
