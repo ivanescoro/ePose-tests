@@ -3,42 +3,51 @@ import { login } from "../../utils/login";
 
 test('account register', async ({ page }) => {
     //can change name of the customer
-    const name = "Oaron Test";
+    const name = `Phaeton Test`;
 
-    test.setTimeout(1300000);
+    test.setTimeout(1200000);
 
     await login(page, { email: "bestivulle36@yopmail.com", password: "qwert6y7u" });
 
     await page.getByText('新規登録').first().click();
     //Furigana
-    await page.getByRole('textbox').nth(2).fill(`${name}`);
+    await page.getByRole('textbox').nth(2).fill(name);
 
     //Height
-    await page.locator('.ant-select-selector').first().click();
+    const heightSelect = page.locator('.ant-select-selector').first();
+    await heightSelect.click();
     await page.getByRole('option', { name: '142' }).click();
 
-    //Sex
-    await page.getByRole('radio', { name: '男性' }).click();
-    // page.getByRole('radio', { name: '女性' })
-    // page.getByRole('radio', { name: '無回答' })
+    //Sex options 男性, 女性, 無回答
+    await page.getByRole('radio', { name: '男性' }).check();
 
     //Year
-    await page.locator('.ant-select.ant-select-outlined.date-select > .ant-select-selector').first().click()
+    const yearSelect = page.locator('.date-select .ant-select-selector').first();
+    await yearSelect.click();
     await page.getByRole('option', { name: '2002' }).click();
     //Month
-    await page.locator('div:nth-child(3) > .ant-select-selector').click();
+    const monthSelect = page.locator('.date-select .ant-select-selector').nth(1);
+    await monthSelect.click();
     await page.getByRole('option', { name: '11' }).click();
     //Day
-    await page.locator('div:nth-child(5) > .ant-select-selector').click();
+    const daySelect = page.locator('.date-select .ant-select-selector').nth(2);
+    await daySelect.click();
     await page.getByRole('option', { name: '16' }).click();
-    await page.getByRole('checkbox').click();
+
+    await page.getByRole('checkbox').check();
+
     //Submit
     await page.getByRole('button', { name: '保 存' }).click();
     await page.waitForTimeout(10000);
 
-    await page.locator("div[role='dialog']").isVisible().then(async (isVisible) => {
-        isVisible && await page.getByText('顧客一覧へもどる').click();
-    });
+    const dialog = page.locator("div[role='dialog']");
+    if (await dialog.isVisible({ timeout: 5000 })) {
+        await page.getByText('顧客一覧へもどる').click();
+    }
+
+    // await page.locator("div[role='dialog']").isVisible().then(async (isVisible) => {
+    //     isVisible && await page.getByText('顧客一覧へもどる').click();
+    // });
 
     await expect(page.getByText(`${name}`)).not.toHaveCount(0);
 

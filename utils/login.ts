@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 
 export async function login(page: Page, credentials?: { email?: string | "", password?: string | "" }) {
+
     await page.goto('https://app-stg.epose.com/login', { waitUntil: 'domcontentloaded' });
 
     const closeButton = page.locator('button', { hasText: 'とじる' });
@@ -10,12 +11,9 @@ export async function login(page: Page, credentials?: { email?: string | "", pas
 
     await page.getByRole('textbox', { name: 'メールアドレス' }).fill(credentials?.email ?? "bestivulle40@yopmail.com");
     await page.getByRole('textbox', { name: 'パスワード' }).fill(credentials?.password ?? "qwert6y7u");
-
-    // await page.getByRole('button', { name: 'ログイン' }).click();
-    // await page.waitForURL('https://app-stg.epose.com/customers', { waitUntil: "domcontentloaded", timeout: 600000 });
-
     await page.getByRole('button', { name: 'ログイン' }).click();
     await page.waitForTimeout(5000);
+
     const continueButton = page.getByRole('button', { name: '続行する' });
     if (await continueButton.isVisible()) {
         await continueButton.click();

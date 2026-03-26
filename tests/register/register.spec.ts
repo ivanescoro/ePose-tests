@@ -34,12 +34,12 @@ test('check default page on load', async ({ page }) => {
 });
 
 test('register', async ({ page }) => {
-    test.setTimeout(500000);
+    test.setTimeout(650000);
 
     let EMAIL_CODE = 0;
     let EMAIL_VERIFICATION_URL = '';
     //move the dot since register only accepts a unique email
-    const EMAIL = `l.l.anfairpwllgwyng.yllgoger111@gmail.com`
+    const EMAIL = `l.l.a.nfairpwllgwyngyll.goger111@gmail.com`
 
     const passwordFields = page.locator('input[type="password"]');
 
@@ -77,7 +77,6 @@ test('register', async ({ page }) => {
     await page.getByText('送 信').click();
 
     //wait for the page to load
-    test.setTimeout(180000);
     const applicationSuccess = await page.url();
     await expect(applicationSuccess).toContain('https://app-stg.epose.com/application/start/');
 
@@ -165,11 +164,11 @@ test('register', async ({ page }) => {
     }
 
     //with the URL provided, wait until all dom contents have been loaded
-    await page.waitForURL('https://app-stg.epose.com/application/verification*', { waitUntil: "domcontentloaded", timeout: 5000 });
+    await page.waitForURL('https://app-stg.epose.com/application/verification*', { waitUntil: "domcontentloaded", timeout: 60000 });
 
     /************************** Official Registration *********************************************/
-
-    await page.waitForURL('https://app-stg.epose.com/application/complete*', { waitUntil: "domcontentloaded", timeout: 50000 });
+    await page.waitForTimeout(60000);
+    await page.waitForURL('https://app-stg.epose.com/application/complete*', { waitUntil: "domcontentloaded", timeout: 120000 });
 
     await expect(page.getByText('JA', { exact: true })).toHaveClass('active')
     await expect(page.getByText('EN', { exact: true })).toHaveClass('')

@@ -3,7 +3,7 @@ import { login } from "../../utils/login";
 
 test('analysis report', async ({ page }) => {
     test.setTimeout(500000);
-    login(page, { email: "bestivulle39@yopmail.com", password: "qwert6y7u" });
+    await login(page, { email: "bestivulle39@yopmail.com", password: "qwert6y7u" });
 
     await page.getByRole('img').nth(4).click();
 
