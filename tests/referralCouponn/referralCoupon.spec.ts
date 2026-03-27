@@ -2,44 +2,48 @@ import { test, expect, chromium } from '@playwright/test';
 import { login } from "../../utils/login";
 import { waitForEmail } from '../../utils/gmail';
 
-test('referral', async () => {
+test('referral coupon', async () => {
     test.setTimeout(300000);
 
+    let emailedCode = '';
     const browser = await chromium.launch();
     const context = await browser.newContext({
         permissions: ['clipboard-read', 'clipboard-write'],
     });
     const page = await context.newPage();
-    let codeExists = false;
 
-    await login(page, { email: "bestivulle37@yopmail.com", password: "qwert6y7u" });
-
+    await login(page, { email: "bestivulle44@yopmail.com", password: "qwert6y7u" });
 
     await page.getByRole('img', { name: 'Menu' }).click();
 
-    await expect(page.getByText('紹介クーポン', { exact: true })).toBeVisible();
+    const couponNavigator = page.getByText('紹介クーポン', { exact: true });
+    await expect(couponNavigator).toBeVisible();
     await page.getByText('紹介クーポン', { exact: true }).click();
 
     await expect(page.locator('.coupon-code-description > span')).toContainText('5');
     await expect(page.locator('.coupon-code-text')).toBeVisible();
 
-    await expect(page.getByRole('button', { name: 'コピー' })).toBeVisible();
-    await page.getByRole('button', { name: 'コピー' }).click();
+    const copyButton = page.getByRole('button', { name: 'コピー' })
+    await expect(copyButton).toBeVisible();
+    await copyButton.click();
 
     await expect(page.getByRole('button', { name: 'コピーしました' })).toBeVisible();
 
     const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-    await expect(clipboardText).toBe('RKH43080');
+    await expect(clipboardText).toBe('V7I34N0E');
 
-    await expect(page.getByRole('button', { name: 'メールで紹介する' })).toBeVisible();
-    await page.getByRole('button', { name: 'メールで紹介する' }).click();
+    const emailButton = page.getByRole('button', { name: 'メールで紹介する' });
+    await expect(emailButton).toBeVisible();
+    await emailButton.click();
 
-    await expect(page.getByPlaceholder('example@epose.com')).toBeVisible();
-    await page.getByPlaceholder('example@epose.com').fill('llanfairpwllgwyngyllgoger111@gmail.com');
+    const emailField = page.getByPlaceholder('example@epose.com')
+    await expect(emailField).toBeVisible();
+    await emailField.fill('llanfairpwllgwyngyllgoger111@gmail.com');
 
-    await expect(page.getByRole('button', { name: '送信する' })).toBeVisible();
-    await page.getByRole('button', { name: '送信する' }).click();
-
+    const sendEmailButton = page.getByRole('button', { name: '送信する' })
+    await expect(sendEmailButton).toBeVisible();
+    await sendEmailButton.click();
+    await page.waitForTimeout(3000)
     const emailCheck = await waitForEmail('llanfairpwllgwyngyllgoger111@gmail.com', '紹介クーポンが届きました');
     //expect email to not be null to confirm existence
     await expect(emailCheck).not.toBeNull();
@@ -49,18 +53,7 @@ test('referral', async () => {
 
     //set the fetched emails body OR set it to empty
     await page.setContent(emailCheck?.body || '');
+    emailedCode = await emailCheck?.body.match(/V7I34N0E/)?.toString() || '';
 
-    //checks all divs inside table cells
-    const divs = await page.locator('table tr td div');
-    const counter = await divs.count();
-
-    for (let i = 0; i < counter; i++) {
-        const div = divs.nth(i);
-        if (await div.textContent() === 'RKH43080') {
-            codeExists = true;
-            break;
-        }
-    }
-
-    expect(codeExists).toBeTruthy();
+    expect(emailedCode).toBeTruthy();
 });
